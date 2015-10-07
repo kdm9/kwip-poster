@@ -13,6 +13,7 @@
             labelfont=bf]{caption}
 \usepackage{amsfonts, amsmath, amsthm, amssymb}
 \usepackage{wrapfig}
+\usepackage{fancybox}
 \usepackage[maxnames=4,
             style=numeric,
             backend=biber,
@@ -22,6 +23,7 @@
             eprint=false,
             url=false]{biblatex}
 \bibliography{kwip}
+\renewcommand{\bibfont}{\normalfont\small}
 
 \begin{document}
 
@@ -63,15 +65,6 @@ the genetic relatedness between samples without alignment or assembly. We show
 from sequencing reads generated with various modern sequencing platforms, as
 well as from simulated data.
 
-\texttt{kWIP} works by decomposing sequencing reads to short $k$-mers, hashing
-these $k$-mers using a constant-memory data structure, and performing pairwise
-distance calculation between these sample $k$-mer hashes. The power of
-\texttt{kWIP} comes from the weighting applied across different hash values,
-which decreases the effect of erroneous, rare or over-abundant $k$-mers while
-focusing on k-mers which give the most insight into the similarity of samples.
-\texttt{kWIP} is free, open source software implemented in C++ and released
-under the GNU LGPL v3.
-
 \end{abstract}
 
 %------------------------------------------------------------------------------
@@ -81,10 +74,10 @@ under the GNU LGPL v3.
 \section*{Introduction}
 
 Modern population genomics requires sequencing many thousands of samples. To
-distill knowelege from this data requires analysis by sequence comparison. To
+distill knowledge from this data requires analysis by sequence comparison. To
 compare such datasets, algorithmic improvement is required. Alignment-free
 sequence comparison is a powerful field of algorithms which overcome some
-shortcomings of sequence alignment. However, few alignnment free algorthims can
+shortcomings of sequence alignment. However, few alignment free algorithms can
 process raw data from modern sequencing platforms, which sequence genomes as
 millions of short fragments. kWIP extends alignment-free sequence comparison
 algorithms to accept sequencing data directly.
@@ -101,14 +94,14 @@ distance calculation between these sample $k$-mer hashes. One can calculate
 the inner product between hashes as a similarity measure. However, this treats
 all $k$-mers as of equal importance and accuracy. Therefore, \texttt{kWIP}
 applies a weight to each $k$-mer to reduce the contribution of technical noise
-to the overall signal, and focus on $k$-mers which provide maxmial information
+to the overall signal, and focus on $k$-mers which provide maximal information
 about relatedness within a population.
 
 %------------------------------------------------
 
 \subsection*{Hashing}
 
-Sequence reads are decomposed into $k$-mers and counted in a proababilistic
+Sequence reads are decomposed into $k$-mers and counted in a probabilistic
 data structure (Hash). This hashing is performed using the \texttt{khmer} C++
 library \cite{crusoe_khmer_2015}.
 
@@ -121,7 +114,7 @@ library \cite{crusoe_khmer_2015}.
 \subsection*{Entropy vector weighting}
 
 To calculate the weighting applied to each $k$-mer, we first calculate the
-frequency of occurance of the $k$-mer in the population. This is simply the
+frequency of occurrence of the $k$-mer in the population. This is simply the
 proportion of samples with non-zero counts of a given $k$-mer.
 
 \begin{center}
@@ -139,10 +132,10 @@ Shannon entropy is calculated per (\ref{eqn:shannon}).
 
 \subsection*{Inner Product Calculation}
 
-Inner products are calcualted pairwise between all samples, and represents the
-cosine simiarity in inner product space of the two hash vectors. The inner
-product between two hashes alone is calculated as (\ref{eqn:ip}). The weighted
-inner product calculation is calculated per (\ref{eqn:wip}).
+Sample similarity is calculated pairwise between all samples as the innner
+product of hashes. The inner product between two hashes alone is calculated as
+(\ref{eqn:ip}). The weighted inner product calculation is calculated per
+(\ref{eqn:wip}).
 
 \begin{equation}
   \langle A, B \rangle = \sum_{i} A_i \cdot B_i
@@ -156,11 +149,10 @@ inner product calculation is calculated per (\ref{eqn:wip}).
 
 \subsection*{Implementation}
 
-\texttt{kWIP} is impemented in C++11, utilising the khmer C++ library. Weighted
+\texttt{kWIP} is implemented in C++11, utilising the khmer C++ library. Weighted
 and unweighted inner products have been implemented. \texttt{kWIP} uses OpenMP
-to parallelise distance matrix calculation in a threadsafe manner. We use
-a shared-memory LRU cache of hashes to reduce computation time and memory
-usage.
+to parallelise distance matrix calculation in a thread-safe manner.
+
 
 %------------------------------------------------------------------------------
 %	RESULTS
@@ -175,37 +167,48 @@ unweighted metric.
 \subsection*{Methods}
 
 Random genomes with equal base composition, and genetic variation from these
-genomes, were simulated using the mason genome simulation suite (parameters
-below) and \texttt{seq-gen}. Reads were hashed using \texttt{khmer} version
-2.0, and \texttt{kwip} was run with default parameters in both weighted and
-unweighed mode.
+genomes, were simulated using the mason genome simulation suite
+\cite{holtgrewe_mason_2010} and \texttt{seq-gen}\cite{rambaut_seq-gen:_1997}.
+Reads were hashed using \texttt{khmer} version 2.0, and \texttt{kWIP} was run
+with default parameters in both weighted and unweighed mode.
 
-Specifically, we simulate a 1MBp genome and four populations derived from this
-genome (see tree below). We then simulated three samples from each population,
-at four coverages (1x, 2x, 5x, 10x).
+\begin{center}
+  \vspace{1cm}
+  \includegraphics[width=25cm]{true-dendro.png}
+\end{center}
 
 \subsection*{Simulation Results}
 
+\begin{center}
+  \includegraphics[width=30cm]{mats.png}
+  \vspace{1cm}
+\end{center}
 
-\subsection*{Computational Efficiency}
+Above we see \texttt{kWIP}'s estimation of the genetic relatedness between
+simulated samples. Note the increased resolution and fidelety of the WIP when
+compared to the IP distance matrix.
 
-\texttt{kWIP} can calculate pairwise relatedness 
+\texttt{kWIP} can calculate pairwise relatedness between 96 samples of 3Gbp in
+approximately 10 hours on 16 CPUs.
 
 %------------------------------------------------------------------------------
 %	CONCLUSIONS
 %------------------------------------------------------------------------------
 
-\color{SaddleBrown}
+\color{ForestGreen}
 
-\section*{Conclusions}
 
+\section*{Summary}
+\Large
+\texttt{kWIP}: a fast tool to determine approximate genetic relatedness
 \begin{itemize}
-  \item \texttt{kWIP} is a fast tool to determine approximate genetic
-    relatedness in an entirely \textit{de novo} and alignnent free manner.
-  \item Hashing $k$-mers into probabilistic data structures enables the rapid
-    estimation of population hashes.
+  \item Entirely \textit{de novo} and alignment free
+  \item Hashes $k$-mers into probabilistic data structures
+  \item Calculates inner products between sample hashes
+  \item Available from \url{https://github.com/kdmurray91/kwip} under the GNU GPL v3+.
 \end{itemize}
 
+\normalsize
 \color{Black}
 
 %------------------------------------------------------------------------------
@@ -217,13 +220,8 @@ at four coverages (1x, 2x, 5x, 10x).
 A paper describing \texttt{kWIP} in more detail is in preparation. We plan to
 deploy \texttt{kWIP} for use as a quality assurance measure across several
 large-scale plant population genome sequencing projects. We plan to implement
-MPI-based paralellism, and to extend kwip to full counting Bloom filters or
-counting de Bruijin graphs.
-
-%------------------------------------------------------------------------------
-%	REFERENCES
-%------------------------------------------------------------------------------
-\printbibliography
+MPI-based parallelism, and to extend kwip to full counting Bloom filters or
+counting de Bruijn graphs.
 
 %------------------------------------------------------------------------------
 %	ACKNOWLEDGEMENTS
@@ -234,7 +232,17 @@ counting de Bruijin graphs.
 We thank Conrad Burden, Terry Neeman, Ben Kahler, Gavin Huttley and Cameron
 Jack for comments or advice on algorithms and experiments presented here.
 
-%------------------------------------------------------------------------------
+\end{multicols}
+\begin{multicols}{2}
 
+
+%------------------------------------------------------------------------------
+%	REFERENCES
+%------------------------------------------------------------------------------
+\tiny
+\printbibliography
+\normalsize
+
+%------------------------------------------------------------------------------
 \end{multicols}
 \end{document}
