@@ -1,7 +1,7 @@
 
 kwip.pdf: kwip.tex
 	lualatex kwip.tex
-	#biber kwip
+	biber kwip
 	lualatex kwip.tex
 	lualatex kwip.tex
 
