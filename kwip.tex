@@ -33,7 +33,7 @@
 \Huge \textbf{\texttt{kWIP}: The $k$-mer Weighted Inner Product}\\[0.9cm]
 \Large \textbf{Kevin Murray$^{1,3}$, C Webers$^2$, C S Ong$^2$, J Borevitz$^{1,3}$, N Warthmann$^{1,3}$}\\[0.5cm]
 \large $^1$: ARC CoE in Plant Energy Biology, ANU, Canberra\\[0.2cm]
-\large $^2$: NICTA, Canberra\\[0.4cm]
+\large $^2$: National ICT Australia (NICTA), and The Australian National University, Canberra, Australia\\[0.4cm]
 \large $^3$: Research School of Biology, ANU, Canberra\\[0.4cm]
 \large \texttt{kevin.murray@anu.edu.au} \hspace{1cm} Poster URL: \large
 \url{http://git.io/vcxYF} $
@@ -56,21 +56,15 @@ $\\
 %	ABSTRACT
 %------------------------------------------------------------------------------
 
-\begin{abstract}
-\vspace{5mm}
+\section*{Abstract}
 
-Modern techniques in population genomics generate unprecedented quantities of
-data within which complex genetic histories reside. The scale and complexity of
-these data require the development of new approaches to the analysis of genetic
-data. We present the $k$-mer Weighted Inner Product, a \textit{de novo},
-alignment free measure of genetic similarity between samples in a population.
+We present the $k$-mer Weighted Inner Product, a \textit{de novo}, alignment
+free measure of genetic similarity between samples in a population.
 \texttt{kWIP}, is an efficient tool implementing this metric that can determine
 the genetic relatedness between samples without alignment or assembly. We show
-\texttt{kWIP} can reconstruct the true relatedness between samples directly
-from sequencing reads generated with various modern sequencing platforms, as
-well as from simulated data.
-
-\end{abstract}
+\texttt{kWIP} can reconstruct the true relatedness between samples directly from
+sequencing reads generated with various modern sequencing platforms, as well as
+from simulated data.
 
 %------------------------------------------------------------------------------
 %	INTRODUCTION
@@ -81,11 +75,11 @@ well as from simulated data.
 Modern population genomics requires sequencing many thousands of samples. To
 distil knowledge from this data requires analysis by sequence comparison. To
 compare such datasets, algorithmic improvement is required. Alignment-free
-sequence comparison is a powerful field of algorithms which overcome some
-shortcomings of sequence alignment. However, few alignment free algorithms can
-process raw data from modern sequencing platforms, which sequence genomes as
-millions of short fragments. \texttt{kWIP} extends alignment-free sequence
-comparison algorithms to accept sequencing data directly.
+sequence comparison promises to overcome some shortcomings of sequence
+alignment. However, few alignment free algorithms can process raw data from
+modern sequencing platforms, which sequence genomes as millions of short
+fragments. \texttt{kWIP} extends alignment-free sequence comparison algorithms
+to accept sequencing data directly.
 
 %------------------------------------------------------------------------------
 %	MATERIALS AND METHODS
@@ -176,9 +170,9 @@ Simulated population genome sequencing was used to test the performance of
 \texttt{kWIP}. Populations were generated at random \autocite{staab_scrm:_2015}
 (with fixed $\pi$) , and genomes simulated using evolutionary models
 \autocite{cartwright_dna_2005}. Sequencing reads were simulated at various
-coverage \autocite{holtgrewe_mason_2010}, before $k$-mer counting
+read coverages \autocite{holtgrewe_mason_2010}, before $k$-mer counting
 \autocite{crusoe_khmer_2015} and analysis with \texttt{kWIP}.  Accuracy is
-calculated using Spearman's $rho$ (rank order correlation) of true pairwise
+calculated using rank order correlation (Spearman's $rho$) of true pairwise
 genomic distance and \texttt{kWIP}'s estimate of genetic relatedness.
 
 \subsubsection*{Coverage and Divergence affects performance}
@@ -186,13 +180,13 @@ genomic distance and \texttt{kWIP}'s estimate of genetic relatedness.
 \texttt{kWIP} more accurately estimates genetic distance at higher average
 sample coverage and average pairwise genetic distance. At coverages common in
 population genomics (1-30x coverage) \texttt{kWIP} outperforms the unweighted
-equivalent; the performance of these measures eventually converge. Similar
-patterns are observed when considering average pairwise genetic distance
-($\pi$).
+equivalent; the performance of these measures eventually converge. Similarly,
+\texttt{kWIP}'s performance outperforms the unweighted metric at low average
+pairwise genetic distance ($\pi$).
 
 \begin{center}
-  \includegraphics[width=0.4\linewidth]{coverage-vs-rho_50x.pdf}
-  \includegraphics[width=0.4\linewidth]{pi-vs-performance.pdf}
+  \includegraphics[width=0.35\linewidth]{coverage-vs-rho_50x.pdf}
+  \includegraphics[width=0.35\linewidth]{pi-vs-performance.pdf}
 \end{center}
 
 \subsubsection*{Population structure detected}
@@ -203,8 +197,7 @@ population structure approximately as well as a state-of-the-art reference-based
 variant calling pipeline.
 
 \begin{center}
-  \includegraphics[width=0.34\linewidth]{flowers.png}
-  \includegraphics[width=0.32\linewidth]{chlamy.pdf}
+  \includegraphics[width=0.7\linewidth]{chlamy-both.png}
 \end{center}
 
 
@@ -216,8 +209,8 @@ accuracy. Representative example show below (erroneous clustering indicated by
 red highlighting).
 
 \begin{center}
-  \includegraphics[width=0.3\linewidth]{rice-wip.png}
-  \includegraphics[width=0.3\linewidth]{rice-ip.png}
+  \includegraphics[width=0.28\linewidth]{rice-wip.png}
+  \includegraphics[width=0.28\linewidth]{rice-ip.png}
 \end{center}
 
 
@@ -233,8 +226,9 @@ red highlighting).
 \texttt{kWIP}: a fast tool to determine approximate genetic relatedness
 \begin{itemize}
   \item Entirely \textit{de novo} and alignment free
-  \item Hashes $k$-mers into probabilistic data structures
-  \item Calculates inner products between sample hashes
+  \item Efficient $k$-mer counting into probabilistic data structures (using
+      \texttt{khmer})
+  \item Uses entropy weighting to amplify signal above technical noise
   \item Available from \url{https://github.com/kdmurray91/kwip} under the GNU GPL
 \end{itemize}
 
